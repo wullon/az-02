@@ -1,0 +1,174 @@
+/*     DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2009 Adinpsz contributors
+  7 chemin Villebois 38100 Grenoble
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO. */
+/* This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://sam.zoy.org/wtfpl/COPYING for more details. */ 
+module util.framecounter;
+
+import derelict.sdl.sdl;	
+
+
+class FrameCounter
+{
+	protected
+	{
+		double m_initTime;		
+		double m_elapsedTime = 0.0;	
+		double m_frameRate, m_dt;	
+		int m_totalFrames = -1;
+		
+		double getTime() 
+		{
+			return SDL_GetTicks() * 0.001;
+		}
+		
+		this() 
+		{			
+			reset();
+		}		
+	}
+	
+	public
+	{		
+		
+		double frameRate()
+		{
+			return m_frameRate;
+		}
+		
+		double deltaTime()
+		{
+			return m_dt;
+		}
+		
+		double elapsedTime()
+		{
+			return m_elapsedTime;
+		}		
+		
+		abstract bool tick(); /* true if FPS changed */		
+		
+		int totalFrames()
+		{
+			return m_totalFrames;
+		}
+		
+		void reset()
+		{
+			m_initTime = getTime();	
+		}
+	}
+}
+
+final class VariableFrameCounter : FrameCounter
+{	
+	private 
+	{	
+		int m_frame = 0;	
+		double m_lastTime;
+		double m_updateDuration;
+		double m_lastUpdateTime;
+		bool m_isFirstFrame;
+	}
+	
+	public 
+	{
+		this(double updateDuration) 
+		{			
+			super();
+			m_updateDuration = updateDuration;
+			m_dt = 0.0;
+			m_lastTime = m_lastUpdateTime = m_initTime;
+			m_frameRate = 0.0;
+			m_isFirstFrame = true;
+		}
+		
+		override bool tick()
+		{
+			m_frame++;
+			m_totalFrames++;
+			
+			auto now = getTime();
+			m_elapsedTime = now - m_initTime;
+			auto delta = now - m_lastUpdateTime;
+			if (m_isFirstFrame)
+			{
+				m_dt = 1.0 / 30.0;
+				m_isFirstFrame = false;	
+			} else
+			{
+				m_dt = now - m_lastTime;
+			}
+			m_lastTime = now;
+			
+			if (delta >= m_updateDuration) 
+			{				
+				m_frameRate = m_frame / delta;				
+				m_lastUpdateTime = now;
+				m_frame = 0;
+				return true;
+			} 
+			else 
+			{
+				return false;
+			}
+		}		
+	}	
+}
+
+final class FixedFrameCounter : FrameCounter
+{	
+	private 
+	{	
+		bool m_firstTick;
+		double m_lastTime;
+	}
+	
+	public 
+	{
+		this(double fixedFrameRate) 
+		{			
+			super();
+			m_firstTick = true;
+			m_frameRate = fixedFrameRate;
+			m_dt = 1.0 / fixedFrameRate;
+			m_lastTime = m_initTime;
+		}
+		
+		override bool tick()
+		{
+			auto now = getTime();
+			m_totalFrames++;
+			m_elapsedTime += m_dt;
+			auto wasFirstTick = m_firstTick;
+			m_firstTick = false;
+			
+			/* on attend un peu car pas la peine de se depecher */
+			auto delta = now - m_lastTime;
+			auto toWait = cast(int) ((m_dt - delta) * 1000.0 - 10.0);
+			if (toWait > 0) SDL_Delay(toWait);
+			
+			
+			m_lastTime = now;			
+			return wasFirstTick;
+		}		
+	}	
+}
+		
+		
+		
+
+

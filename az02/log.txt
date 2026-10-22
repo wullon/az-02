@@ -1,0 +1,49 @@
+Command-line :
+D:\az\d\az-02_-_Extatique_src\az02\az02.exe
+-gamma
+1.0
+-w
+1024
+-h
+768
+-ratio
+16/9
+-nf
+### create app
+>sdl.State.this()
+<sdl.State.this()
+>Demo.this
+<Demo.this
+creating timeline
+>Demo.loadAll
+load put shader
+Loading shader data/shaders/put.vs + data/shaders/put.fs
+
+
+
+> load loading screen
+load texture data/tex/loading.jpg
+load texture data/tex/pinknoise.png
+Loading shader data/shaders/blit.vs + data/shaders/blit.fs
+
+
+
+Loading shader data/shaders/progress.vs + data/shaders/progress.fs
+
+
+
+Loading shader data/shaders/loading.vs + data/shaders/loading.fs
+
+
+
+<LoadingScreen.this
+load font
+Loading shader data/shaders/font.vs + data/shaders/font.fs
+
+
+
+Loading shader data/shaders/font.vs + data/shaders/font.fs
+
+
+
+ load tracks info

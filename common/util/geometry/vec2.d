@@ -1,0 +1,212 @@
+module util.geometry.vec2;
+
+//import util.math;
+//import util.common;
+import util.geometry.vectorop;
+import std.string : format;
+
+
+final struct vec2(T) 
+{
+	
+	public {
+
+		union {
+			struct {
+				T x, y;
+			}
+			T[2] v;
+		}
+	}
+	
+	mixin VectorOp!(T, v);
+	
+	
+	public
+	{		
+		//////////////////
+		// constructors //
+		//////////////////
+		
+		static vec2 opCall(T x, T y)
+		{
+			vec2 v = void;
+			v.x = x;
+			v.y = y;
+			return v;
+		}
+		
+		static vec2 opCall(T x)
+		{
+			vec2 v = void;
+			v.x = x;
+			v.y = x;
+			return v;
+		}
+		
+		///////////////
+		// constants //
+		///////////////
+
+		static vec2 ZEROS, ONES;
+		
+		static this()
+		{
+			ZEROS = vec2(0);
+			ONES = vec2(1);
+		}
+		
+		
+		///////////////////////////
+		// GLSL style properties //
+		///////////////////////////
+		
+		vec2 xx() { return vec2(x, x); }
+		vec2 xy() { return vec2(x, y); }
+		vec2 yx() { return vec2(y, x); }
+		vec2 yy() { return vec2(y, y); }
+		
+		vec2 xy(vec2 v) { x = v.x; y = v.y; return v; }
+		vec2 yx(vec2 v) { y = v.x; x = v.y; return v; }
+				
+		
+		//////////////////////////
+		// operator overloading	//
+		//////////////////////////
+		
+		vec2 opAdd(T a) 
+		{
+			return vec2(x + a, y + a);
+		}
+
+		vec2 opAdd(vec2 v) 
+		{
+			return vec2(x + v.x, y + v.y);
+		}
+
+		vec2 opSub(vec2 v) 
+		{
+			return vec2(x - v.x, y - v.y);
+		}
+
+		vec2 opSub(T a) 
+		{
+			return vec2(x - a, y - a);
+		}
+
+		vec2 opSub_r(T a) 
+		{
+			return vec2(a - x, a - y);
+		}
+
+		vec2 opMul(vec2 v) 
+		{
+			return vec2(x * v.x, y * v.y);
+		}
+
+		vec2 opMul(T a) 
+		{
+			return vec2(x * a, y * a);
+		}
+		
+		vec2 opDiv(vec2 v) 
+		{
+			return vec2(x / v.x, y / v.y);
+		}
+
+		vec2 opDiv(T a) 
+		{
+			return vec2(x / a, y / a);
+		}
+
+		void opAddAssign(T a) 
+		{
+			x += a;
+			y += a;
+		}
+
+		void opAddAssign(vec2 v) 
+		{
+			x += v.x;
+			y += v.y;
+		}
+
+		void opSubAssign(T a) 
+		{
+			x -= a;
+			y -= a;
+		}
+
+		void opSubAssign(vec2 v) 
+		{
+			x -= v.x;
+			y -= v.y;
+		}
+
+		void opMulAssign(T a) 
+		{
+			x *= a;
+			y *= a;
+		}
+
+		void opMulAssign(vec2 v) 
+		{
+			x *= v.x;
+			y *= v.y;
+		}
+
+		void opDivAssign(T a) 
+		{
+			x /= a;
+			y /= a;
+		}
+
+		void opDivAssign(vec2 v)
+		{
+			x /= v.x;
+			y /= v.y;
+		}
+
+		vec2 opNeg() 
+		{
+			return vec2(-x, -y);
+		}
+
+		char[] toString() 
+		{
+			return format("(%s %s)", x, y);
+		}
+		
+		static vec2 min(vec2 a, vec2 b)
+		{
+			T x = util.math.min(a.x, b.x);
+			T y = util.math.min(a.y, b.y);
+			return vec2(x, y);	
+		}
+		
+		static vec2 max(vec2 a, vec2 b)
+		{
+			T x = util.math.max(a.x, b.x);
+			T y = util.math.max(a.y, b.y);
+			return vec2(x, y);	
+		}
+	
+	}
+}
+
+	
+
+
+
+
+alias vec2!(int) vec2i;
+alias vec2!(float) vec2f;
+alias vec2!(double) vec2d;
+
+// polar
+deprecated vec2!(T) polar(T)(T angle, T radius)
+{
+	// todo : use sincos
+	return vec2!(T)(sin(angle) * radius, cos(angle) * radius);	
+}
+
